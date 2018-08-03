@@ -1,0 +1,12 @@
+*.bin
+*.hex
+*.elf
+*.map
+*.txt
+*.o
+*.exe
+*.Release
+*.Debug
+Debug
+bin
+obj
