@@ -5,6 +5,8 @@
  *      Author: Gerasimchuk
  *      Versin: 1
  */
+#include "stdint.h"
+
 #include "NRF24L01.h"
 
 NRF_ERROR NRF24L01_init_mcu( S_nrf_config *const pNRF){
@@ -29,10 +31,6 @@ NRF_ERROR NRF24L01_init_nrf(S_nrf_config *const pNRF, const S_NRF_Init* ps_nrf_i
 	NRF24L01_set_address_width(pNRF,ps_nrf_init->address_width);
 	NRF24L01_set_num_retransmit(pNRF,ps_nrf_init->auto_retransmit_count);
 	NRF24L01_set_delay_retransmit(pNRF,ps_nrf_init->auto_retransmit_delay);
-
-
-
-
 	return NRF_ERROR_OK;
 }
 
@@ -67,7 +65,7 @@ NRF_ERROR S_NRF_default(S_NRF_Init* ps_nrf_init){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_config(S_nrf_config *const pNRF, u8 *pread_status_reg){
+NRF_ERROR NRF24L01_get_config(S_nrf_config *const pNRF, uint8_t *pread_status_reg){
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS, 1, pread_status_reg)){return NRF_ERROR_BUSY;}
 	return NRF_ERROR_OK;
 }
@@ -81,7 +79,7 @@ NRF_ERROR NRF24L01_get_config(S_nrf_config *const pNRF, u8 *pread_status_reg){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_status(S_nrf_config *const pNRF, u8 *ppread_status_reg){
+NRF_ERROR NRF24L01_get_status(S_nrf_config *const pNRF, uint8_t *ppread_status_reg){
 	if(NRF24L01_read_reg(pNRF,STATUS_ADDRESS, 1, ppread_status_reg)){return NRF_ERROR_BUSY;}
 	return NRF_ERROR_OK;
 }
@@ -96,7 +94,7 @@ NRF_ERROR NRF24L01_get_status(S_nrf_config *const pNRF, u8 *ppread_status_reg){
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_reset_status_interrupt(S_nrf_config *const pNRF,INTERUPT_MASK clear_interrupt_flag){
-	u8 pread_status_reg;
+	uint8_t pread_status_reg;
 	if(IS_INTERUPT_MASK(clear_interrupt_flag)){return NRF_ERROR_INTERUPT_MASK;}
 	if(NRF24L01_read_reg(pNRF,STATUS_ADDRESS, 1, &pread_status_reg)){return NRF_ERROR_BUSY;}
 	pread_status_reg|=clear_interrupt_flag;
@@ -113,7 +111,7 @@ NRF_ERROR NRF24L01_reset_status_interrupt(S_nrf_config *const pNRF,INTERUPT_MASK
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_fifo_status(S_nrf_config *const pNRF, u8 *pread_status_reg){
+NRF_ERROR NRF24L01_get_fifo_status(S_nrf_config *const pNRF, uint8_t *pread_status_reg){
 	if(NRF24L01_read_reg(pNRF,FIFO_STATUS_ADDRESS, 1, pread_status_reg)){return NRF_ERROR_BUSY;}
 	return NRF_ERROR_OK;
 }
@@ -128,7 +126,7 @@ NRF_ERROR NRF24L01_get_fifo_status(S_nrf_config *const pNRF, u8 *pread_status_re
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_power_switch(S_nrf_config *const pNRF, NRF_STATE new_pwr_up_state){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(!IS_NRF_STATE(new_pwr_up_state)){return NRF_ERROR_PWR_UP_STATE;}
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS, 1, &config_temp_reg)){return NRF_ERROR_BUSY;}
 	((CONFIG*)&config_temp_reg)->PWR_UP=new_pwr_up_state;
@@ -147,7 +145,7 @@ NRF_ERROR NRF24L01_power_switch(S_nrf_config *const pNRF, NRF_STATE new_pwr_up_s
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_enable_crc(S_nrf_config *const pNRF, NRF_STATE new_crc_state){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(!IS_NRF_STATE(new_crc_state)){return NRF_ERROR_PWR_UP_STATE;}
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS, 1, &config_temp_reg)){return NRF_ERROR_BUSY;}
 	((CONFIG*)&config_temp_reg)->EN_CRC=new_crc_state;
@@ -164,7 +162,7 @@ NRF_ERROR NRF24L01_enable_crc(S_nrf_config *const pNRF, NRF_STATE new_crc_state)
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_set_crco(S_nrf_config *const pNRF, CRCO new_crco){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(!IS_CRCO(new_crco)){return NRF_ERROR_PWR_UP_STATE;}
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS, 1, &config_temp_reg)){return NRF_ERROR_BUSY;}
 	((CONFIG*)&config_temp_reg)->EN_CRC=new_crco;
@@ -181,7 +179,7 @@ NRF_ERROR NRF24L01_set_crco(S_nrf_config *const pNRF, CRCO new_crco){
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_set_interrupt(S_nrf_config *const pNRF, INTERUPT_MASK set_interupt){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(IS_INTERUPT_MASK(set_interupt)){return NRF_ERROR_INTERUPT_MASK;}
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS, 1, &config_temp_reg)){return NRF_ERROR_BUSY;}
 	config_temp_reg|=set_interupt;
@@ -199,7 +197,7 @@ NRF_ERROR NRF24L01_set_interrupt(S_nrf_config *const pNRF, INTERUPT_MASK set_int
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_enable_pipe(S_nrf_config *const pNRF, PIPS_DEF PipeNumber){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(!IS_PIPE(PipeNumber)){return NRF_ERROR_PIPE_NUMBER;}
 	if(NRF24L01_read_reg(pNRF,EN_RXADDR_ADDRESS, 1, &config_temp_reg)){return NRF_ERROR_BUSY;}
 	config_temp_reg|=(1<<PipeNumber);
@@ -231,14 +229,14 @@ NRF_ERROR NRF24L01_set_address_width(S_nrf_config *const pNRF, AW  address_width
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_num_retransmit(S_nrf_config *const pNRF, u8  num_retransmit){
+NRF_ERROR NRF24L01_set_num_retransmit(S_nrf_config *const pNRF, uint8_t  num_retransmit){
 	SETUP_RETR S_setup_retr;
 	if(num_retransmit>MAX_QUANTITY_RETRANSMIT){
 		return NRF_ERROR_EXCEED_QUANTITY_RETRANSMIT;
 	}
-	if(NRF24L01_read_reg(pNRF,SETUP_RETR_ADDRESS, 1, (u8*)&S_setup_retr)){return NRF_ERROR_BUSY;}
+	if(NRF24L01_read_reg(pNRF,SETUP_RETR_ADDRESS, 1, (uint8_t*)&S_setup_retr)){return NRF_ERROR_BUSY;}
 	S_setup_retr.ARC=num_retransmit;
-	return NRF24L01_write_reg(pNRF,SETUP_RETR_ADDRESS, 1,(u8*)&S_setup_retr);
+	return NRF24L01_write_reg(pNRF,SETUP_RETR_ADDRESS, 1,(uint8_t*)&S_setup_retr);
 }
 
 //---------NRF24L01_set_delay_retransmit-----------------
@@ -252,9 +250,9 @@ NRF_ERROR NRF24L01_set_num_retransmit(S_nrf_config *const pNRF, u8  num_retransm
 NRF_ERROR NRF24L01_set_delay_retransmit(S_nrf_config *const pNRF, RETRANSMIT_DELAY  auto_retr_delay){
 	SETUP_RETR S_setup_retr;
 	if(!IS_RETRANSMIT_DELAY(auto_retr_delay)){return NRF_ERROR_RETRANSMIT_DELAY;}
-	if(NRF24L01_read_reg(pNRF,SETUP_RETR_ADDRESS, 1, (u8*)&S_setup_retr)){return NRF_ERROR_BUSY;}
+	if(NRF24L01_read_reg(pNRF,SETUP_RETR_ADDRESS, 1, (uint8_t*)&S_setup_retr)){return NRF_ERROR_BUSY;}
 	S_setup_retr.ARD=auto_retr_delay;
-	return NRF24L01_write_reg(pNRF,SETUP_RETR_ADDRESS, 1,(u8*)&S_setup_retr);
+	return NRF24L01_write_reg(pNRF,SETUP_RETR_ADDRESS, 1,(uint8_t*)&S_setup_retr);
 }
 
 //---------NRF24L01_set_rf_chanel-----------------
@@ -265,7 +263,7 @@ NRF_ERROR NRF24L01_set_delay_retransmit(S_nrf_config *const pNRF, RETRANSMIT_DEL
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_rf_chanel(S_nrf_config *const pNRF, u8 number_rf_chanel){
+NRF_ERROR NRF24L01_set_rf_chanel(S_nrf_config *const pNRF, uint8_t number_rf_chanel){
 	if(number_rf_chanel>MAX_NUMBER_RF_CHANEL){return NRF_ERROR_EXCEED_RF_CHANNEL;}
 	return NRF24L01_write_reg(pNRF,RF_CH_ADDRESS, 1,&number_rf_chanel);
 }
@@ -281,7 +279,7 @@ NRF_ERROR NRF24L01_set_rf_chanel(S_nrf_config *const pNRF, u8 number_rf_chanel){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, u8 *pPipeAddress){
+NRF_ERROR NRF24L01_set_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress){
 	if(!IS_PIPE(PipeNumber)){return NRF_ERROR_PIPE_NUMBER;}
 	return NRF24L01_write_reg(pNRF,RX_ADDR_P0_ADDRESS+PipeNumber, 5, pPipeAddress);
 }
@@ -296,7 +294,7 @@ NRF_ERROR NRF24L01_set_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber,
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, u8 *pPipeAddress){
+NRF_ERROR NRF24L01_get_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress){
 	if(!IS_PIPE(PipeNumber)){return NRF_ERROR_PIPE_NUMBER;}
 	return NRF24L01_read_reg(pNRF,RX_ADDR_P0_ADDRESS+PipeNumber, 5, pPipeAddress);
 }
@@ -311,7 +309,7 @@ NRF_ERROR NRF24L01_get_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber,
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_TX_addres(S_nrf_config *const pNRF,u8 *pPipeAddress){
+NRF_ERROR NRF24L01_set_TX_addres(S_nrf_config *const pNRF,uint8_t *pPipeAddress){
 	return NRF24L01_write_reg(pNRF,TX_ADDR_ADDRESS, 5, pPipeAddress);
 }
 
@@ -324,7 +322,7 @@ NRF_ERROR NRF24L01_set_TX_addres(S_nrf_config *const pNRF,u8 *pPipeAddress){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_TX_addres(S_nrf_config *const pNRF,u8 *pPipeAddress){
+NRF_ERROR NRF24L01_get_TX_addres(S_nrf_config *const pNRF,uint8_t *pPipeAddress){
 	return NRF24L01_read_reg(pNRF,TX_ADDR_ADDRESS, 5, pPipeAddress);
 }
 
@@ -338,7 +336,7 @@ NRF_ERROR NRF24L01_get_TX_addres(S_nrf_config *const pNRF,u8 *pPipeAddress){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,u8 *ppayload_size){
+NRF_ERROR NRF24L01_set_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,uint8_t *ppayload_size){
 	if(!IS_PIPE(PipeNumber)){return NRF_ERROR_PIPE_NUMBER;}
 	if(*ppayload_size>MAX_PAYLOAD_SIZE){return NRF_ERROR_PAYLOAD_SIZE;}
 	return NRF24L01_write_reg(pNRF,RX_PW_P0_ADDRESS+PipeNumber, 1, ppayload_size);
@@ -354,8 +352,8 @@ NRF_ERROR NRF24L01_set_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumb
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,u8 *ppayload_size){
-	u8 payload_size;
+NRF_ERROR NRF24L01_get_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,uint8_t *ppayload_size){
+	uint8_t payload_size;
 	if(!IS_PIPE(PipeNumber)){return NRF_ERROR_PIPE_NUMBER;}
 	if(*ppayload_size>MAX_PAYLOAD_SIZE){return NRF_ERROR_PAYLOAD_SIZE;}
 	       NRF24L01_read_reg(pNRF ,RX_PW_P0_ADDRESS, 1, &payload_size);
@@ -372,8 +370,8 @@ NRF_ERROR NRF24L01_get_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumb
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_send_data(S_nrf_config *const pNRF,u8 data_length, u8 const *p_data){
-	u8 config_temp_reg;
+NRF_ERROR NRF24L01_send_data(S_nrf_config *const pNRF,uint8_t data_length, uint8_t const *p_data){
+	uint8_t config_temp_reg;
 	if(data_length>MAX_NUM_BYTES_IN_RX){return NRF_ERROR_MAX_DATA_SIZE;}
 	NRF24L01_write_fifo_tx(pNRF, data_length,p_data); // Load Tx data on fifo_Tx buffer
 	// Clearing PRIM_RX bit to enable PTX mode
@@ -395,7 +393,7 @@ NRF_ERROR NRF24L01_send_data(S_nrf_config *const pNRF,u8 data_length, u8 const *
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_set_rx_mode(S_nrf_config *const pNRF){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS,1,&config_temp_reg)){return NRF_ERROR_BUSY;}
 	((CONFIG*)(&config_temp_reg))->PWR_UP  = NRF_SET;
 	((CONFIG*)(&config_temp_reg))->PRIM_RX = NRF_SET;
@@ -414,7 +412,7 @@ NRF_ERROR NRF24L01_set_rx_mode(S_nrf_config *const pNRF){
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_set_tx_mode(S_nrf_config *const pNRF){
-	u8 config_temp_reg;
+	uint8_t config_temp_reg;
 	if(NRF24L01_read_reg(pNRF,CONFIG_ADDRESS,1,&config_temp_reg)){return NRF_ERROR_BUSY;}
 	((CONFIG*)(&config_temp_reg))->PWR_UP  = NRF_SET;
 	((CONFIG*)(&config_temp_reg))->PRIM_RX = NRF_RESET;

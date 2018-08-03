@@ -6,8 +6,10 @@
  *      Versin: 1
  */
 
+#include "stdint.h"
+
 #include "NRF24L01.h"
-#include "spi_nrf24l01.h"
+#include "moduleHWInit.h"
 
 //---------NRF24L01_read_reg-----------------
 // function NRF24L01_read_reg - read NRF24L01+ register
@@ -19,7 +21,7 @@
 // output arg:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_read_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, u8 num, u8 *pdata_read){
+NRF_ERROR NRF24L01_read_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, uint8_t num, uint8_t *pdata_read){
 	if(!CHECK_NRF_ADDRESS(address_reg)){return NRF_ERROR_ADDRESS_REG;};
 	if(spi_nrf24l01_RX(pNRF,(R_REGISTER|address_reg), pdata_read, num)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
@@ -37,9 +39,9 @@ NRF_ERROR NRF24L01_read_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS addre
 // output arg:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_write_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, u8 num,const u8 *pdata_write){
+NRF_ERROR NRF24L01_write_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, uint8_t num,const uint8_t *pdata_write){
 	if(!CHECK_NRF_ADDRESS(address_reg)){return NRF_ERROR_ADDRESS_REG;};
-	if(spi_nrf24l01_TX(pNRF,(u8)(W_REGISTER|address_reg), pdata_write, num)==BUSY_STATE){ // if SPI in processing - return
+	if(spi_nrf24l01_TX(pNRF,(uint8_t)(W_REGISTER|address_reg), pdata_write, num)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
 	};
 	return NRF_ERROR_OK;
@@ -55,8 +57,8 @@ NRF_ERROR NRF24L01_write_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS addr
 // output arg:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_write_fifo_tx(S_nrf_config *const pNRF , u8 num,const u8 *pdata_write){
-	if(spi_nrf24l01_TX(pNRF,(u8)(W_TX_PAYLOAD), pdata_write, num)==BUSY_STATE){ // if SPI in processing - return
+NRF_ERROR NRF24L01_write_fifo_tx(S_nrf_config *const pNRF , uint8_t num,const uint8_t *pdata_write){
+	if(spi_nrf24l01_TX(pNRF,(uint8_t)(W_TX_PAYLOAD), pdata_write, num)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
 	};
 	return NRF_ERROR_OK;
@@ -72,8 +74,8 @@ NRF_ERROR NRF24L01_write_fifo_tx(S_nrf_config *const pNRF , u8 num,const u8 *pda
 // output arg:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_read_fifo_rx(S_nrf_config *const pNRF , u8 num,u8 *pdata_read){
-	if(spi_nrf24l01_RX(pNRF,(u8)(R_RX_PAYLOAD), pdata_read, num)==BUSY_STATE){ // if SPI in processing - return
+NRF_ERROR NRF24L01_read_fifo_rx(S_nrf_config *const pNRF , uint8_t num,uint8_t *pdata_read){
+	if(spi_nrf24l01_RX(pNRF,(uint8_t)(R_RX_PAYLOAD), pdata_read, num)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
 	};
 	return NRF_ERROR_OK;
@@ -88,7 +90,7 @@ NRF_ERROR NRF24L01_read_fifo_rx(S_nrf_config *const pNRF , u8 num,u8 *pdata_read
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_FLUSH_TX(S_nrf_config *const pNRF){
-	if(spi_nrf24l01_TX(pNRF,(u8)(FLUSH_TX), (u8*)0, 0)==BUSY_STATE){ // if SPI in processing - return
+	if(spi_nrf24l01_TX(pNRF,(uint8_t)(FLUSH_TX), (uint8_t*)0, 0)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
 	};
 	return NRF_ERROR_OK;
@@ -102,7 +104,7 @@ NRF_ERROR NRF24L01_FLUSH_TX(S_nrf_config *const pNRF){
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_FLUSH_RX(S_nrf_config *const pNRF){
-	if(spi_nrf24l01_TX(pNRF,(u8)(FLUSH_RX), (u8*)0, 0)==BUSY_STATE){ // if SPI in processing - return
+	if(spi_nrf24l01_TX(pNRF,(uint8_t)(FLUSH_RX), (uint8_t*)0, 0)==BUSY_STATE){ // if SPI in processing - return
 		return NRF_ERROR_BUSY;
 	};
 	return NRF_ERROR_OK;

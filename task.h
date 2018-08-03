@@ -12,7 +12,7 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "NRF24L01.h"
-#include "spi_nrf24l01.h"
+#include "moduleHWInit.h"
 
 
 //=================NRF1 DEFINITION========================

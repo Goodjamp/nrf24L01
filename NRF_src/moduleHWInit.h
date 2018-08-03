@@ -8,6 +8,7 @@
 
 #ifndef SPI_NRF24L01_H_
 #define SPI_NRF24L01_H_
+#include "stdint.h"
 
 #include "stm32f10x.h"
 #include "stm32f10x_gpio.h"
@@ -66,15 +67,15 @@
 
 /*
 //============================ENABLE SPI INTERRRUPT====================================
-#define ENABLE_TX_RX_INTERUPT(X)    SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_RXNE,ENABLE);\
-                                    SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_TXE,ENABLE);
-#define ENABLE_TX_INTERUPT(X)       SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_TXE,ENABLE);
-#define ENABLE_RX_INTERUPT(X)       SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_RXNE,ENABLE);
+#define ENABLE_TX_RX_INTERUPT(X)    SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_RXNE,ENABLE);\
+                                    SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_TXE,ENABLE);
+#define ENABLE_TX_INTERUPT(X)       SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_TXE,ENABLE);
+#define ENABLE_RX_INTERUPT(X)       SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_RXNE,ENABLE);
 //============================DISABLE SPI INTERRRUPT============================
-#define DISABLE_TX_RX_INTERUPT(X)   SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_RXNE,DISABLE);\
-                                    SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_TXE,DISABLE);
-#define DISABLE_TX_INTERUPT(X)      SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_TXE,DISABLE);
-#define DISABLE_RX_INTERUPT(X)      SPI_I2S_ITConfig(X,(u8)SPI_I2S_IT_RXNE,DISABLE);
+#define DISABLE_TX_RX_INTERUPT(X)   SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_RXNE,DISABLE);\
+                                    SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_TXE,DISABLE);
+#define DISABLE_TX_INTERUPT(X)      SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_TXE,DISABLE);
+#define DISABLE_RX_INTERUPT(X)      SPI_I2S_ITConfig(X,(uint8_t)SPI_I2S_IT_RXNE,DISABLE);
 //====================================================================================
 */
 
@@ -102,15 +103,15 @@ typedef enum{
 
 
 typedef struct{
-	u8 *p_buff_rx;
-	u8 buff_tx[BUFF_LIFO_SIZE];
-	u8 counter_tx;
-	u8 counter_rx;
-	u8 num;
+	uint8_t *p_buff_rx;
+	uint8_t buff_tx[BUFF_LIFO_SIZE];
+	uint8_t counter_tx;
+	uint8_t counter_rx;
+	uint8_t num;
 }S_buf_rx_rx;
 
 typedef struct{
-	u8 f_interrupt;
+	uint8_t f_interrupt;
 	S_buf_rx_rx buf;
 	TEMP_RXTX_MODE tx_rx_mode;
 }S_buf_spi;
@@ -120,29 +121,29 @@ typedef struct{
 	GPIO_TypeDef *CE_port;
 	GPIO_TypeDef *CSN_port;
 	GPIO_TypeDef *IRQ_port;
-	u16 CE_pin;
-	u16 CSN_pin;
-	u16 IRQ_pin;
+	uint16_t CE_pin;
+	uint16_t CSN_pin;
+	uint16_t IRQ_pin;
 	SPI_TypeDef *SPI;
 } S_peref;
 
 typedef struct{
-	u8 f_interrupt;
+	uint8_t f_interrupt;
 	S_buf_spi buf_g;
 	S_peref peref;
 }S_nrf_config;
 
 
 
-u8 mcu_nrf_init( S_nrf_config *const pNRF);
+uint8_t mcu_nrf_init( S_nrf_config *const pNRF);
 void init_spi(volatile  S_nrf_config *p_nrf);
 S_nrf_config* processing_init(const S_peref *per);
 PER_ERROR init_gpio(const S_nrf_config *pnrf_gpio);
-STATE spi_nrf24l01_TX(S_nrf_config *p_nrf,u8 comand, const u8 *p_data, u8 length);
-STATE spi_nrf24l01_RX(S_nrf_config *p_nrf,u8 comand, u8 *p_data, u8 length);
+STATE spi_nrf24l01_TX(S_nrf_config *p_nrf,uint8_t comand, const uint8_t *p_data, uint8_t length);
+STATE spi_nrf24l01_RX(S_nrf_config *p_nrf,uint8_t comand, uint8_t *p_data, uint8_t length);
 STATE spi_nrf24l01_get_state(S_nrf_config *p_nrf);
 void remap_out_pin(void);
-u8 rcc_gpio_enable(const GPIO_TypeDef *gpio_enable);
+uint8_t rcc_gpio_enable(const GPIO_TypeDef *gpio_enable);
 
 
 #endif

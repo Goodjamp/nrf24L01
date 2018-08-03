@@ -5,8 +5,9 @@
  *      Author: Gerasimchuk
  *      Versin: 1
  */
-//#include "NRF24L01.h"
-#include "spi_nrf24l01.h"
+#include "stdint.h"
+
+#include "moduleHWInit.h"
 #include "stm32f10x_exti.h"
 #include "string.h"
 
