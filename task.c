@@ -100,7 +100,7 @@ void task_nrf24l01(void){
 	NRF24L01_set_tx_mode(NRF1);
 
 	//==============transmit first part of data=======================
-	NRF24L01_write_fifo_tx(NRF1,size_payload, read_buf);
+	NRF24L01_send_data(NRF1,size_payload, read_buf);
 
 	//------------ wait receive  data-------------------
 	while(status_reg.RX_DR==0){
@@ -116,8 +116,7 @@ void task_nrf24l01(void){
 	NRF24L01_get_status(NRF2,(uint8_t*)&status_reg);
 	NRF24L01_read_rx_data(NRF2,size_payload, &read_buf[20]);
 	//==============transmit second part of data=======================
-	NRF24L01_write_fifo_tx(NRF1,size_payload,(uint8_t*)&read_buf[10]);
-	nrf24l01_ce_puls(NRF1);
+	NRF24L01_send_data(NRF1,size_payload,(uint8_t*)&read_buf[10]);
 
 	//------------ wait receive  data-------------------
 	//while(!NRF2.f_interrupt){

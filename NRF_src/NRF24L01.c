@@ -440,12 +440,15 @@ NRF_ERROR NRF24L01_read_rx_data(nrfHeader inNRF , uint8_t num, uint8_t *pdata_re
 //       >0 - ref. NRF_ERROR reason
 NRF_ERROR NRF24L01_set_rx_mode(nrfHeader inNRF){
 	uint8_t config_temp_reg;
-	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg)){return NRF_BUSY;}
+	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg))
+	{
+		return NRF_BUSY;
+	}
 	((CONFIG*)(&config_temp_reg))->PWR_UP  = NRF_SET;
 	((CONFIG*)(&config_temp_reg))->PRIM_RX = NRF_SET;
 	((CONFIG*)(&config_temp_reg))->CRCO    = NRF_SET;
 	NRF24L01_write_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg);
-	nrf24l01_ce_puls(inNRF);
+	nrf24l01_ce_set(inNRF);
 	return NRF_OK;
 }
 

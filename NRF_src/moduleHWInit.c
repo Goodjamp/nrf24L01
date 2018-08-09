@@ -378,6 +378,8 @@ static inline void spiRXProcessing(USER_SPI inSPI)
 	{
 		spiComState[inSPI].startTxFlag = false;
 		(void)listOfSPI[inSPI]->DR;
+		SPI_I2S_SendData(listOfSPI[inSPI], (uint16_t)0);
+		return;
 	}
 	spiComState[inSPI].data[spiComState[inSPI].dataCnt++] = (uint8_t)SPI_I2S_ReceiveData(listOfSPI[inSPI]);
 	if(spiComState[inSPI].dataCnt == spiComState[inSPI].totalNumber)
@@ -455,7 +457,7 @@ STATE nrf24l01_spi_RX(nrfHeader inNRF, uint8_t comand, uint8_t *p_data, uint8_t 
 	{
 		return 0;  //TODO return correct status!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}
-    if((spiComState[spiIndex].comState != SPI_STATE_COMPLITED) ||
+    if((spiComState[spiIndex].comState != SPI_STATE_COMPLITED) &&
        (spiComState[spiIndex].comState != SPI_STATE_ERROR))
     {
     	return spiComState[spiIndex].comState;
@@ -467,10 +469,11 @@ STATE nrf24l01_spi_RX(nrfHeader inNRF, uint8_t comand, uint8_t *p_data, uint8_t 
     spiComState[spiIndex].comState    = SPI_STATE_RX;
 
     SPI_Cmd(listOfSPI[spiIndex], ENABLE);
+    SPI_I2S_ReceiveData(listOfSPI[spiIndex]);
     CSN_PIN_RESET(gpioComState[spiIndex]);
 	SPI_I2S_ReceiveData(listOfSPI[spiIndex]);            // read DR for clear RXNE flag ()
 	SPI_I2S_SendData(listOfSPI[spiIndex],(u16)(comand));
-	ENABLE_TX_INTERUPT(listOfSPI[spiIndex]);
+	ENABLE_RX_INTERUPT(listOfSPI[spiIndex]);
 	while(spiComState[spiIndex].comState == SPI_STATE_RX){}  // Wait completing transaction
 	// according  RM0090 25.3.8
 	while(SPI_I2S_GetFlagStatus(listOfSPI[spiIndex], SPI_I2S_FLAG_RXNE) == SET){}
@@ -586,7 +589,7 @@ uint8_t mcu_nrf_init(nrfHeader inNRF, USER_SPI inSPI)
 }
 
 
-void  nrf24l01_ce_set  (nrfHeader inNRF)
+void  nrf24l01_ce_set(nrfHeader inNRF)
 {
 	uint8_t spiIndex;
 	if( (spiIndex = getSPIIndex(inNRF)) == 0xFF)
@@ -618,7 +621,7 @@ void  nrf24l01_ce_puls (nrfHeader inNRF)
 	CE_PIN_SET(gpioComState[spiIndex]);
 
 	volatile uint32_t cnt = 0;
-	while(cnt++ < (72*10/2)){}
+	while(cnt++ < (72*1)){}
 
 	CE_PIN_RESET(gpioComState[spiIndex]);
 }
