@@ -9,8 +9,13 @@
 #ifndef NRF24L01_H_
 #define  NRF24L01_H_
 #include "stdint.h"
+#include "stdbool.h"
+#include "NRF24L01user.h"
 
-#include "moduleHWInit.h"
+typedef struct nrfHeaderT
+{
+    bool isInterrupt;
+}nrfHeaderT;
 
 // --------------definitions property of NRF24L01+ ------------------------
 #define MAX_NUMBER_RF_CHANEL        (uint8_t)125
@@ -33,35 +38,6 @@ typedef enum{
       NOP                 =   (uint8_t)0b11111111
 }NRF24L01_COMAND;
 //----------------------Registers Address----------------------------------
-typedef enum{
-              CONFIG_ADDRESS    =   (uint8_t)0x00,
-              EN_AA_ADDRESS     =   (uint8_t)0x01,
-              EN_RXADDR_ADDRESS =   (uint8_t)0x02,
-              SETUP_AW_ADDRESS  =   (uint8_t)0x03,
-              SETUP_RETR_ADDRESS=   (uint8_t)0x04,
-              RF_CH_ADDRESS     =   (uint8_t)0x05,
-              RF_SETUP_ADDRESS  =   (uint8_t)0x06,
-              STATUS_ADDRESS    =   (uint8_t)0x07,
-              OBSERVE_TX_ADDRESS=   (uint8_t)0x08,
-              RPD_ADDRESS       =   (uint8_t)0x09,
-              RX_ADDR_P0_ADDRESS=   (uint8_t)0x0a,
-              RX_ADDR_P1_ADDRESS=   (uint8_t)0x0b,
-              RX_ADDR_P2_ADDRESS=   (uint8_t)0x0c,
-              RX_ADDR_P3_ADDRESS=   (uint8_t)0x0d,
-              RX_ADDR_P4_ADDRESS=   (uint8_t)0x0e,
-              RX_ADDR_P5_ADDRESS=   (uint8_t)0x0f,
-              TX_ADDR_ADDRESS   =   (uint8_t)0x10,
-              RX_PW_P0_ADDRESS  =   (uint8_t)0x11,
-              RX_PW_P1_ADDRESS  =   (uint8_t)0x12,
-              RX_PW_P2_ADDRESS  =   (uint8_t)0x13,
-              RX_PW_P3_ADDRESS  =   (uint8_t)0x14,
-              RX_PW_P4_ADDRESS  =   (uint8_t)0x15,
-              RX_PW_P5_ADDRESS  =   (uint8_t)0x16,
-              FIFO_STATUS_ADDRESS=  (uint8_t)0x17,
-              DYNPD_ADDRESS     =   (uint8_t)0x1C,
-              FEATURE_ADDRESS   =   (uint8_t)0x1D
-}NRF24L01_REG_ADDRESS;
-
 #define CHECK_NRF_ADDRESS(X)  ((X==CONFIG_ADDRESS)||(X==EN_AA_ADDRESS)||(X==EN_RXADDR_ADDRESS)||(X==SETUP_AW_ADDRESS)||\
 							   (X==SETUP_RETR_ADDRESS)||(X==RF_CH_ADDRESS)||(X==RF_SETUP_ADDRESS)||(X==STATUS_ADDRESS)||\
 							   (X==OBSERVE_TX_ADDRESS)||(X==RPD_ADDRESS)||(X==RX_ADDR_P0_ADDRESS)||(X==RX_ADDR_P1_ADDRESS)||\
@@ -69,126 +45,6 @@ typedef enum{
 							   (X==TX_ADDR_ADDRESS)||(X==RX_PW_P0_ADDRESS)||(X==RX_PW_P1_ADDRESS)||(X==RX_PW_P2_ADDRESS)||\
 							   (X==RX_PW_P3_ADDRESS)||(X==RX_PW_P4_ADDRESS)||(X==RX_PW_P5_ADDRESS)||(X==FIFO_STATUS_ADDRESS))
 
-// ------SET/RESET NRF state definition------------
-typedef enum{
-	NRF_RESET = (uint8_t)0,
-	NRF_SET   = (uint8_t)1
-}NRF_STATE;
-
-#define IS_NRF_STATE(X) ((X==NRF_RESET)||(X==NRF_SET))
-
-//===================DEFINITION BIT CONFIG REGISTER=============================//
-typedef enum{
-	MASK_RX_DR  =(uint8_t)0b01000000,
-	MASK_TX_DS  =(uint8_t)0b00100000,
-	MASK_MAX_RT =(uint8_t)0b00010000
-}INTERUPT_MASK;
-
-#define IS_INTERUPT_MASK(X) ( (~(MASK_RX_DR|MASK_TX_DS|MASK_MAX_RT)) & X)
-
-typedef enum{
-	CRCO_1_BYTES=(uint8_t)0,
-	CRCO_2_BYTES=(uint8_t)1
-}CRCO;
-
-#define IS_CRCO(X) ((X==CRCO_1_BYTES)||(X==CRCO_2_BYTES))
-
-//===================DEFINITION BIT EN_AA REGISTER=================================//
-//===================DEFINITION BIT EN_RXADDR REGISTER=============================//
-// -----------pipes definition-------------------------
-typedef enum{
-	PIPE0=(uint8_t)0,
-	PIPE1=(uint8_t)1,
-	PIPE2=(uint8_t)2,
-	PIPE3=(uint8_t)3,
-	PIPE4=(uint8_t)4,
-	PIPE5=(uint8_t)5
-}PIPS_DEF;
-
-#define IS_PIPE(X) ((X==PIPE0)||(X==PIPE1)||\
-		            (X==PIPE2)||(X==PIPE3)||\
-		            (X==PIPE4))
-
-//===================DEFINITION BIT SETUP_AW REGISTER=============================//
-//---------------RX/TX Address field width DEFINITION----------------------------
-typedef enum{
-	AW_3_BYTES=(uint8_t)0b01,
-	AW_4_BYTES=(uint8_t)0b10,
-	AW_5_BYTES=(uint8_t)0b11
-}AW;
-
-#define IS_AW(X) ((X==AW_3_BYTES)||(X==AW_4_BYTES)||\
-                 (X==AW_5_BYTES))
-
-
-//===================DEFINITION BIT SETUP_RETR REGISTER=============================//
-//-------------------Auto Retransmit Delay definition-------------------------------
-typedef enum{
-	WAIT_250uS=(uint8_t)0b0000,
-	WAIT_500uS=(uint8_t)0b0001,
-	WAIT_750uS=(uint8_t)0b0010,
-	WAIT_1000uS=(uint8_t)0b0011,
-	WAIT_1250uS=(uint8_t)0b0100,
-	WAIT_1500uS=(uint8_t)0b0101,
-	WAIT_1750uS=(uint8_t)0b0110,
-	WAIT_2000uS=(uint8_t)0b0111,
-	WAIT_2250uS=(uint8_t)0b1000,
-	WAIT_2500uS=(uint8_t)0b1001,
-	WAIT_2750uS=(uint8_t)0b1010,
-	WAIT_3000uS=(uint8_t)0b1011,
-	WAIT_3250uS=(uint8_t)0b1100,
-	WAIT_3500uS=(uint8_t)0b1101,
-	WAIT_3750uS=(uint8_t)0b1110,
-	WAIT_4000uS=(uint8_t)0b1111,
-}RETRANSMIT_DELAY;
-
-#define IS_RETRANSMIT_DELAY(X) ((X==WAIT_250uS)||(X==WAIT_500uS)||(X==WAIT_750uS)||(X==WAIT_1000uS)||\
-		               	   	   (X==WAIT_1250uS)||(X==WAIT_1500uS)||(X==WAIT_1750uS)||(X==WAIT_2000uS)||\
-		               	   	   (X==WAIT_2250uS)||(X==WAIT_2500uS)||(X==WAIT_2750uS)||(X==WAIT_3000uS)||\
-		               	   	   (X==WAIT_3250uS)||(X==WAIT_3500uS)||(X==WAIT_3750uS)||(X==WAIT_4000uS))
-
-
-//===================DEFINITION BIT RH_CH REGISTER==================================//
-
-//===================DEFINITION BIT RH_SETUP REGISTER===============================//
-//--------------Select between the high speed data rates DEFINITION--------------
-typedef enum{
-	DATA_SPEED_1M   =(uint8_t)0b00,
-	DATA_SPEED_2M   =(uint8_t)0b01,
-	DATA_SPEED_250K =(uint8_t)0b10
-}RF_DR_HIGHT;
-
-#define IS_RF_DR_HIGHT(X) ((X==DATA_SPEED_1M)||(X==DATA_SPEED_2M)||\
-		                  (X==DATA_SPEED_250K))
-
-//-------------Set RF output power in TX mode  DEFINITION------------------------
-typedef enum{
-	DATA_PWR_m18dBm =(uint8_t)0b00,
-	DATA_PWR_m12dBm =(uint8_t)0b01,
-	DATA_PWR_m6dBm  =(uint8_t)0b10,
-	DATA_PWR_0dBm   =(uint8_t)0b11
-}RF_PWR;
-
-#define IS_RF_PWR(X) ((X==DATA_PWR_m18dBm)||(X==DATA_PWR_m12dBm)||\
-		             (X==DATA_PWR_m6dBm)||(X==DATA_PWR_0dBm))
-
-
-//======================ERROR SYAYUS NRF24L01=========================================
-typedef enum{
-	NRF_ERROR_OK            =(uint8_t)0,
-	NRF_ERROR_BUSY          =(uint8_t)1,
-	NRF_ERROR_PIPE_NUMBER   =(uint8_t)2,
-	NRF_ERROR_ADDRESS_REG   =(uint8_t)3,
-	NRF_ERROR_AMOUNT_NRF    =(uint8_t)4,
-	NRF_ERROR_EXCEED_QUANTITY_RETRANSMIT =(uint8_t)5,
-	NRF_ERROR_ADDRESS_WIDTH =(uint8_t)6,
-	NRF_ERROR_MAX_DATA_SIZE =(uint8_t)7,
-	NRF_ERROR_PWR_UP_STATE  =(uint8_t)8,
-	NRF_ERROR_INTERUPT_MASK =(uint8_t)9,
-	NRF_ERROR_PAYLOAD_SIZE  =(uint8_t)10,
-	NRF_ERROR_RETRANSMIT_DELAY =(uint8_t)11,
-	NRF_ERROR_EXCEED_RF_CHANNEL =(uint8_t)12
-}NRF_ERROR;
 
 #pragma pack(push, 1)
 
@@ -240,7 +96,7 @@ typedef struct{
 
 //---------------------RF Channel selekted---------------------------------------
 typedef struct{
-	uint8_t RF_CH:2;
+	uint8_t RF_CH:7;
     uint8_t Reserved:1;
 }RF_CH;
 
@@ -415,16 +271,16 @@ typedef struct{
 
 //----------Init pipe struct-----------------
 typedef struct{
-	NRF_STATE crc_state;
-	CRCO      crc_width;
-	AW        address_width;
-	uint8_t        auto_retransmit_delay;
-	uint8_t        auto_retransmit_count;  // 0 - retransmit disabled
-	uint8_t        rf_chanel;              // radio frequency channel number 0-127 1 mHz resolution
+	NRF_STATE   crc_state;
+	CRCO        crc_width;
+	AW          address_width;
+	uint8_t     auto_retransmit_delay;
+	uint8_t     auto_retransmit_count;  // 0 - retransmit disabled
+	uint8_t     rf_chanel;              // radio frequency channel number 0-127 1 mHz resolution
 	RF_DR_HIGHT speed;
-	RF_PWR    out_amplifare;
-	uint8_t        transmit_address[5];
-	NRF_STATE dynamic_payload_state;
+	RF_PWR      out_amplifare;
+	uint8_t     transmit_address[5];
+	NRF_STATE   dynamic_payload_state;
 }S_NRF_Init;
 
 //----------Init pipe struct-----------------
@@ -433,8 +289,8 @@ typedef struct{
 	PIPS_DEF  num_pipe;
 	NRF_STATE auto_ack_state;
 	NRF_STATE dunamic_payload_state;
-	uint8_t        size_payload;
-	uint8_t        address_pipe_rx[5];
+	uint8_t   size_payload;
+	uint8_t   address_pipe_rx[5];
 }S_NRF_Pipe_Init;
 
 
@@ -453,37 +309,11 @@ typedef struct{
 #define  DYNAMIC_PAYLOAD_STATE_DEFAULT  NRF_RESET
 
 
-
-NRF_ERROR NRF24L01_read_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, uint8_t num, uint8_t *pdata_read);
-NRF_ERROR NRF24L01_write_reg(S_nrf_config *const pNRF ,NRF24L01_REG_ADDRESS address_reg, uint8_t num,const uint8_t *pdata_write);
-NRF_ERROR NRF24L01_write_fifo_tx(S_nrf_config *const pNRF , uint8_t num,const uint8_t *pdata_write);
-NRF_ERROR NRF24L01_read_fifo_rx(S_nrf_config *const pNRF , uint8_t num,uint8_t *pdata_read);
-NRF_ERROR NRF24L01_FLUSH_TX(S_nrf_config *const pNRF);
-NRF_ERROR NRF24L01_FLUSH_RX(S_nrf_config *const pNRF);
-
-
-NRF_ERROR NRF24L01_init_mcu(S_nrf_config *const pNRF);
-NRF_ERROR NRF24L01_get_config(S_nrf_config *const pNRF, uint8_t *pread_status_reg);
-NRF_ERROR NRF24L01_get_status(S_nrf_config *const pNRF, uint8_t *ppread_status_reg);
-NRF_ERROR NRF24L01_reset_status_interrupt(S_nrf_config *const pNRF,INTERUPT_MASK clear_interrupt_flag);
-NRF_ERROR NRF24L01_get_fifo_status(S_nrf_config *const pNRF, uint8_t *pread_status_reg);
-NRF_ERROR NRF24L01_power_switch(S_nrf_config *const pNRF, NRF_STATE new_pwr_up_state);
-NRF_ERROR NRF24L01_enable_crc(S_nrf_config *const pNRF, NRF_STATE new_crc_state);
-NRF_ERROR NRF24L01_set_crco(S_nrf_config *const pNRF, CRCO new_crco);
-NRF_ERROR NRF24L01_set_interrupt(S_nrf_config *const pNRF, INTERUPT_MASK set_interupt);
-NRF_ERROR NRF24L01_enable_AA(S_nrf_config *const pNRF, PIPS_DEF PipeNumber);
-NRF_ERROR NRF24L01_enable_pipe(S_nrf_config *const pNRF, PIPS_DEF PipeNumber);
-NRF_ERROR NRF24L01_set_address_width(S_nrf_config *const pNRF, AW  address_width);
-NRF_ERROR NRF24L01_set_num_retransmit(S_nrf_config *const pNRF, uint8_t  num_retransmit);
-NRF_ERROR NRF24L01_set_delay_retransmit(S_nrf_config *const pNRF, RETRANSMIT_DELAY  auto_retr_delay);
-NRF_ERROR NRF24L01_set_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress);
-NRF_ERROR NRF24L01_get_RX_address(S_nrf_config *const pNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress);
-NRF_ERROR NRF24L01_set_TX_addres(S_nrf_config *const pNRF,uint8_t *pPipeAddress);
-NRF_ERROR NRF24L01_get_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,uint8_t *ppayload_size);
-NRF_ERROR NRF24L01_set_TX_PayloadSize(S_nrf_config *const pNRF,PIPS_DEF PipeNumber,uint8_t *ppayload_size);
-NRF_ERROR NRF24L01_get_TX_addres(S_nrf_config *const pNRF,uint8_t *pPipeAddress);
-NRF_ERROR NRF24L01_set_rx_mode(S_nrf_config *const pNRF);
-NRF_ERROR NRF24L01_set_tx_mode(S_nrf_config *const pNRF);
-NRF_ERROR NRF24L01_send_data(S_nrf_config *const pNRF,uint8_t data_length, uint8_t const *p_data);
+NRF_ERROR NRF24L01_read_reg     (nrfHeader inNRF, NRF24L01_REG_ADDRESS address_reg, uint8_t num, uint8_t *pdata_read);
+NRF_ERROR NRF24L01_write_reg    (nrfHeader inNRF, NRF24L01_REG_ADDRESS address_reg, uint8_t num, uint8_t *pdata_write);
+NRF_ERROR NRF24L01_write_fifo_tx(nrfHeader inNRF, uint8_t num, uint8_t *pdata_write);
+NRF_ERROR NRF24L01_read_fifo_rx (nrfHeader inNRF, uint8_t num, uint8_t *pdata_read);
+NRF_ERROR NRF24L01_FLUSH_TX     (nrfHeader inNRF);
+NRF_ERROR NRF24L01_FLUSH_RX     (nrfHeader inNRF);
 
 #endif
