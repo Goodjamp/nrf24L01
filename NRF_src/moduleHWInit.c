@@ -186,7 +186,7 @@ static PER_ERROR init_gpio(USER_SPI inSPI)
 	rcc_gpio_enable(gpioComState[inSPI].CE_port);
 	GPIO_InitTypeDef_NRF.GPIO_Mode=GPIO_Mode_Out_PP;
 	GPIO_InitTypeDef_NRF.GPIO_Pin=gpioComState[inSPI].CE_pin;
-	GPIO_InitTypeDef_NRF.GPIO_Speed=GPIO_Speed_2MHz;
+	GPIO_InitTypeDef_NRF.GPIO_Speed=GPIO_Speed_10MHz;
 	GPIO_Init(gpioComState[inSPI].CE_port, &GPIO_InitTypeDef_NRF);
 	CE_PIN_RESET(gpioComState[inSPI]);
 
@@ -621,7 +621,7 @@ void  nrf24l01_ce_puls (nrfHeader inNRF)
 	CE_PIN_SET(gpioComState[spiIndex]);
 
 	volatile uint32_t cnt = 0;
-	while(cnt++ < (72*1)){}
+	while(cnt++ < (72*4)){}
 
 	CE_PIN_RESET(gpioComState[spiIndex]);
 }

@@ -12,6 +12,16 @@
 #include "NRF24L01user.h"
 
 
+#define restricAvoidType(USER_TYPE, UNION_NAME, IN_ARG) \
+union                                                   \
+{                                                       \
+    uint8_t    *simplType;                              \
+    USER_TYPE  *userType;                               \
+}UNION_NAME =                                           \
+{                                                       \
+	.userType = IN_ARG                 \
+};
+
 struct{
     nrfHeaderT nrfP[MAX_NUMBER_OF_NRF];
     uint8_t cntNRF;
@@ -76,8 +86,13 @@ NRF_ERROR S_NRF_default(S_NRF_Init* ps_nrf_init){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_config(nrfHeader inNRF, uint8_t *pread_status_reg){
-	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS, 1, pread_status_reg)){return NRF_BUSY;}
+NRF_ERROR NRF24L01_get_config(nrfHeader inNRF, CONFIG *pread_configuration_reg)
+{
+	restricAvoidType(CONFIG, readReg, pread_configuration_reg)
+	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS, 1, readReg.simplType ))
+	{
+		return NRF_BUSY;
+	}
 	return NRF_OK;
 }
 
@@ -90,8 +105,13 @@ NRF_ERROR NRF24L01_get_config(nrfHeader inNRF, uint8_t *pread_status_reg){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_get_status(nrfHeader inNRF, uint8_t *ppread_status_reg){
-	if(NRF24L01_read_reg(inNRF,STATUS_ADDRESS, 1, ppread_status_reg)){return NRF_BUSY;}
+NRF_ERROR NRF24L01_get_status_tx_rx(nrfHeader inNRF, STATUS *ppread_satus_reg)
+{
+	restricAvoidType(STATUS, readReg, ppread_satus_reg)
+	if(NRF24L01_read_reg(inNRF,STATUS_ADDRESS, 1, readReg.simplType))
+	{
+		return NRF_BUSY;
+	}
 	return NRF_OK;
 }
 
@@ -104,12 +124,21 @@ NRF_ERROR NRF24L01_get_status(nrfHeader inNRF, uint8_t *ppread_status_reg){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_clear_interrupt(nrfHeader inNRF,INTERUPT_MASK clear_interrupt_flag){
+NRF_ERROR NRF24L01_clear_interrupt(nrfHeader inNRF,STATUS_MASK clear_interrupt_flag){
 	uint8_t pread_status_reg;
-	if(IS_INTERUPT_MASK(clear_interrupt_flag)){return NRF_ERROR_INTERUPT_MASK;}
-	if(NRF24L01_read_reg(inNRF,STATUS_ADDRESS, 1, &pread_status_reg)){return NRF_BUSY;}
+	if(IS_INTERUPT_MASK(clear_interrupt_flag))
+	{
+		return NRF_ERROR_INTERUPT_MASK;
+	}
+	if(NRF24L01_read_reg(inNRF,STATUS_ADDRESS, 1, &pread_status_reg))
+	{
+		return NRF_BUSY;
+	}
 	pread_status_reg|=clear_interrupt_flag;
-	if(NRF24L01_write_reg(inNRF,STATUS_ADDRESS, 1, &pread_status_reg)){return NRF_BUSY;}
+	if(NRF24L01_write_reg(inNRF,STATUS_ADDRESS, 1, &pread_status_reg))
+	{
+		return NRF_BUSY;
+	}
 	return NRF_OK;
 }
 
@@ -189,7 +218,7 @@ NRF_ERROR NRF24L01_set_crco(nrfHeader inNRF, CRCO new_crco){
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR NRF24L01_set_interrupt(nrfHeader inNRF, INTERUPT_MASK set_interupt){
+NRF_ERROR NRF24L01_set_interrupt(nrfHeader inNRF, STATUS_MASK set_interupt){
 	uint8_t config_temp_reg;
 	if(IS_INTERUPT_MASK(set_interupt)){return NRF_ERROR_INTERUPT_MASK;}
 	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS, 1, &config_temp_reg)){return NRF_BUSY;}
@@ -402,6 +431,8 @@ NRF_ERROR NRF24L01_send_data(nrfHeader inNRF,uint8_t data_length, uint8_t *p_dat
 		return NRF_ERROR_MAX_DATA_SIZE;
 	}
 	NRF24L01_write_fifo_tx(inNRF, data_length,p_data); // Load Tx data on fifo_Tx buffer
+	nrf24l01_ce_puls(inNRF);
+	/*
 	// Clearing PRIM_RX bit to enable PTX mode
 	if(NRF24L01_read_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg))
 	{
@@ -411,6 +442,7 @@ NRF_ERROR NRF24L01_send_data(nrfHeader inNRF,uint8_t data_length, uint8_t *p_dat
 	NRF24L01_write_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg);
 	// Making short pulse on CE for start transmit
 	nrf24l01_ce_puls(inNRF);
+	*/
 	return NRF_OK;
 }
 
@@ -467,7 +499,6 @@ NRF_ERROR NRF24L01_set_tx_mode(nrfHeader inNRF){
 	((CONFIG*)(&config_temp_reg))->PRIM_RX = NRF_RESET;
 	((CONFIG*)(&config_temp_reg))->CRCO    = NRF_SET;
 	NRF24L01_write_reg(inNRF,CONFIG_ADDRESS,1,&config_temp_reg);
-	nrf24l01_ce_puls(inNRF);
 	return NRF_OK;
 }
 
