@@ -12,16 +12,13 @@
 #include "stdbool.h"
 #include "NRF24L01user.h"
 
-typedef struct nrfHeaderT
-{
-    bool isInterrupt;
-}nrfHeaderT;
-
 // --------------definitions property of NRF24L01+ ------------------------
-#define MAX_NUMBER_RF_CHANEL        (uint8_t)125
-#define MAX_QUANTITY_RETRANSMIT     (uint8_t)0b1111
-#define MAX_NUM_BYTES_IN_RX         (uint8_t)32
-#define MAX_PAYLOAD_SIZE            (uint8_t)32
+#define MAX_NUMBER_RF_CHANEL     (uint8_t)125
+#define MAX_QUANTITY_RETRANSMIT  (uint8_t)0b1111
+#define MAX_NUM_BYTES_IN_RX      (uint8_t)32
+#define MAX_PAYLOAD_SIZE         (uint8_t)32
+#define REG_MAP_FIRST_PART_LEN   (uint8_t)0x18
+#define REG_MAP_SECOND_PART_LEN  (uint8_t)0x2
 
 //----------------------SPI command----------------------------------------
 typedef enum{
@@ -38,42 +35,47 @@ typedef enum{
       NOP                 =   (uint8_t)0b11111111
 }NRF24L01_COMAND;
 //----------------------Registers Address----------------------------------
-#define CHECK_NRF_ADDRESS(X)  ((X==CONFIG_ADDRESS)||(X==EN_AA_ADDRESS)||(X==EN_RXADDR_ADDRESS)||(X==SETUP_AW_ADDRESS)||\
-							   (X==SETUP_RETR_ADDRESS)||(X==RF_CH_ADDRESS)||(X==RF_SETUP_ADDRESS)||(X==STATUS_ADDRESS)||\
-							   (X==OBSERVE_TX_ADDRESS)||(X==RPD_ADDRESS)||(X==RX_ADDR_P0_ADDRESS)||(X==RX_ADDR_P1_ADDRESS)||\
-							   (X==RX_ADDR_P2_ADDRESS)||(X==RX_ADDR_P3_ADDRESS)||(X==RX_ADDR_P4_ADDRESS)||(X==RX_ADDR_P5_ADDRESS)||\
-							   (X==TX_ADDR_ADDRESS)||(X==RX_PW_P0_ADDRESS)||(X==RX_PW_P1_ADDRESS)||(X==RX_PW_P2_ADDRESS)||\
-							   (X==RX_PW_P3_ADDRESS)||(X==RX_PW_P4_ADDRESS)||(X==RX_PW_P5_ADDRESS)||(X==FIFO_STATUS_ADDRESS))
+#define CHECK_NRF_ADDRESS(X)  ((X==CONFIG_ADDRESS)     || (X==EN_AA_ADDRESS)      || (X==EN_RXADDR_ADDRESS)    ||\
+                               (X==SETUP_AW_ADDRESS)   || (X==SETUP_RETR_ADDRESS) || (X==RF_CH_ADDRESS)        ||\
+                               (X==RF_SETUP_ADDRESS)   || (X==STATUS_ADDRESS)     || (X==OBSERVE_TX_ADDRESS)   ||\
+                               (X==RPD_ADDRESS)        || (X==RX_ADDR_P0_ADDRESS) || (X==RX_ADDR_P1_ADDRESS)   ||\
+							   (X==RX_ADDR_P2_ADDRESS) || (X==RX_ADDR_P3_ADDRESS) || (X==RX_ADDR_P4_ADDRESS)   ||\
+							   (X==RX_ADDR_P5_ADDRESS) || (X==TX_ADDR_ADDRESS)    || (X==RX_PW_P0_ADDRESS)     ||\
+							   (X==RX_PW_P1_ADDRESS)   || (X==RX_PW_P2_ADDRESS)   || (X==RX_PW_P3_ADDRESS)     ||\
+							   (X==RX_PW_P4_ADDRESS)   || (X==RX_PW_P5_ADDRESS)   || (X==FIFO_STATUS_ADDRESS) || \
+							   (X==DYNPD_ADDRESS)      || (X==FEATURE_ADDRESS))
 
 
 #pragma pack(push, 1)
 
 //---------------------global reg map---------------------------------------------
 typedef struct{
-	CONFIG      config;
-	EN_AA       en_aa;
-	EN_RXADDR   en_rxaddr;
-	SETUP_AW    setup_aw;
-	SETUP_RETR  setup_petr;
-	RF_CH       rf_ch;
-	RF_SETUP    rf_setup;
-	STATUS      status;
-	OBSERVE_TX  observe_tx;
-	RPD         rpd;
-	RX_ADDR_P   rx_addr_p0;
-	RX_ADDR_P   rx_addr_p1;
-	RX_ADDR_P   rx_addr_p2;
-	RX_ADDR_P   rx_addr_p3;
-	RX_ADDR_P   rx_addr_p4;
-	RX_ADDR_P   rx_addr_p5;
-	TX_ADDR     tx_addr;
-	RX_PW_P     rx_pw_p0;
-	RX_PW_P     rx_pw_p1;
-	RX_PW_P     rx_pw_p2;
-	RX_PW_P     rx_pw_p3;
-	RX_PW_P     rx_pw_p4;
-	RX_PW_P     rx_pw_p5;
-	FIFO_STATUS fifo_status;
+	CONFIG       config;
+	EN_AA        en_aa;
+	EN_RXADDR    en_rxaddr;
+	SETUP_AW     setup_aw;
+	SETUP_RETR   setup_petr;
+	RF_CH        rf_ch;
+	RF_SETUP     rf_setup;
+	STATUS       status;
+	OBSERVE_TX   observe_tx;
+	RPD          rpd;
+	RX_ADDR_P0_1 rx_addr_p0;
+	RX_ADDR_P0_1 rx_addr_p1;
+	RX_ADDR_P2_5 rx_addr_lsb_p2;
+	RX_ADDR_P2_5 rx_addr_lsb_p3;
+	RX_ADDR_P2_5 rx_addr_lsb_p4;
+	RX_ADDR_P2_5 rx_addr_lsb_p5;
+	TX_ADDR      tx_addr;
+	RX_PW_P      rx_pw_p0;
+	RX_PW_P      rx_pw_p1;
+	RX_PW_P      rx_pw_p2;
+	RX_PW_P      rx_pw_p3;
+	RX_PW_P      rx_pw_p4;
+	RX_PW_P      rx_pw_p5;
+	FIFO_STATUS  fifo_status;
+	DYNPD        bynpd;
+	FEATURE      feature;
 }S_GLOBAL_REG_MAP;
 
 //----------Init pipe struct-----------------
@@ -100,6 +102,12 @@ typedef struct{
 	uint8_t   address_pipe_rx[5];
 }S_NRF_Pipe_Init;
 
+
+typedef struct nrfHeaderT
+{
+    bool isInterrupt;
+    S_GLOBAL_REG_MAP global_reg_map;
+}nrfHeaderT;
 
 #pragma pack(pop)
 

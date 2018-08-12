@@ -32,12 +32,7 @@
 #define SPI2_IRQ_PORT  GPIOA
 #define SPI2_IRQ_PIN   GPIO_Pin_8
 
-
-typedef enum{
-	USER_SPI1,
-	USER_SPI2,
-	USER_SPI_QUANTITY
-}USER_SPI;
+#define MAX_NUM_SPI 2
 
 #define CSN_PIN_SET(X)   GPIO_SetBits(X.CSN_port,X.CSN_pin)
 #define CSN_PIN_RESET(X) GPIO_ResetBits(X.CSN_port,X.CSN_pin)
@@ -55,8 +50,5 @@ typedef enum{
 	PER_ERROR_CSN_PORT,
 	PER_ERROR_SPI_NUMBER
 }PER_ERROR;
-
-uint8_t mcu_nrf_init( nrfHeader inNRF, USER_SPI inSPI);
-
 
 #endif

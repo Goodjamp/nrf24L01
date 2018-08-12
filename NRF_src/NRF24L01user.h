@@ -13,6 +13,15 @@
 
 typedef struct nrfHeaderT *nrfHeader;
 
+typedef enum
+{
+    NRF_INTERFACE_N01 = (uint8_t)0,
+    NRF_INTERFACE_N02 = (uint8_t)1,
+    NRF_INTERFACE_N03 = (uint8_t)2,
+    NRF_INTERFACE_N04 = (uint8_t)3,
+    NRF_INTERFACE_N05 = (uint8_t)4,
+}NRF_INTERFACE;
+
 typedef enum{
               CONFIG_ADDRESS      =   (uint8_t)0x00,
               EN_AA_ADDRESS       =   (uint8_t)0x01,
@@ -243,18 +252,20 @@ typedef struct{
 	uint8_t RPD:1;
     uint8_t Reserved:6;
 }RPD;
-/************************Receive address data pipe************************/
 
+/************************Receive address data pipe 0, 1************************/
 typedef struct{
-	uint32_t RX_ADDR_P;
-    uint8_t  RX_ADDR_P_MSB;
-}RX_ADDR_P;
+    uint8_t  RX_ADDR_P_MSB[5];
+}RX_ADDR_P0_1;
 
+/************************Receive address data pipe 2, 5************************/
+typedef struct{
+    uint8_t  RX_ADDR_P_LSB;
+}RX_ADDR_P2_5;
 
 /************************Transmit address************************/
 typedef struct{
-	uint32_t TX_ADDR;
-    uint8_t  TX_ADDR_MSB;
+	uint8_t TX_ADDR[5];
 }TX_ADDR;
 
 /************************Number of bytes in RX payload in data pipe************************/
@@ -294,7 +305,7 @@ typedef struct{
 }FEATURE;
 
 
-nrfHeader NRF24L01_init(void);
+nrfHeader NRF24L01_init              (NRF_INTERFACE inINterface);
 NRF_ERROR NRF24L01_get_config        (nrfHeader inNRF, CONFIG *pread_configuration_reg);
 NRF_ERROR NRF24L01_get_status_tx_rx  (nrfHeader inNRF, STATUS *ppread_satus_reg);
 NRF_ERROR NRF24L01_get_status_fifo   (nrfHeader inNRF, FIFO_STATUS *ppread_satus_reg);
@@ -314,8 +325,8 @@ NRF_ERROR NRF24L01_set_RX_address    (nrfHeader inNRF, PIPS_DEF PipeNumber, uint
 NRF_ERROR NRF24L01_get_RX_address    (nrfHeader inNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress);
 NRF_ERROR NRF24L01_set_TX_addres     (nrfHeader inNRF, uint8_t *pPipeAddress);
 NRF_ERROR NRF24L01_get_TX_addres     (nrfHeader inNRF, uint8_t *pPipeAddress);
-NRF_ERROR NRF24L01_set_TX_PayloadSize(nrfHeader inNRF, PIPS_DEF PipeNumber,uint8_t *ppayload_size);
-NRF_ERROR NRF24L01_get_TX_PayloadSize(nrfHeader inNRF, PIPS_DEF PipeNumber,uint8_t *ppayload_size);
+NRF_ERROR NRF24L01_set_TX_PayloadSize(nrfHeader inNRF, PIPS_DEF PipeNumber,uint8_t ppayload_size);
+NRF_ERROR NRF24L01_get_RX_PayloadSize(nrfHeader inNRF, PIPS_DEF PipeNumber,uint8_t *ppayload_size);
 NRF_ERROR NRF24L01_set_rx_mode       (nrfHeader inNRF);
 NRF_ERROR NRF24L01_set_tx_mode       (nrfHeader inNRF);
 NRF_ERROR NRF24L01_send_data         (nrfHeader inNRF, uint8_t data_length, uint8_t *p_data);
@@ -335,5 +346,6 @@ STATE nrf24l01_spi_RX  (nrfHeader inNRF, uint8_t comand, uint8_t *p_data, uint8_
 void  nrf24l01_ce_set  (nrfHeader inNRF);
 void  nrf24l01_ce_clear(nrfHeader inNRF);
 void  nrf24l01_ce_puls (nrfHeader inNRF);
+uint8_t nrf24l01_interface_init(nrfHeader inNRF, NRF_INTERFACE inINterface);
 
 #endif

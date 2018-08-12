@@ -23,7 +23,10 @@
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
 inline NRF_ERROR NRF24L01_read_reg(nrfHeader inNRF ,NRF24L01_REG_ADDRESS address_reg, uint8_t num, uint8_t *pdata_read){
-	if(!CHECK_NRF_ADDRESS(address_reg)){return NRF_ERROR_ADDRESS_REG;};
+	if(!CHECK_NRF_ADDRESS(address_reg))
+	{
+		return NRF_ERROR_ADDRESS_REG;
+	};
 	if(nrf24l01_spi_RX(inNRF,(R_REGISTER|address_reg), pdata_read, num)==STATE_BUSY)
 	{ // if SPI in processing - return
 		return NRF_BUSY;
