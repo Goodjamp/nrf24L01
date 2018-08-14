@@ -3,7 +3,7 @@
 #define PROCESSING_FEQMETTER_H_
 
 #define I2C_SENSOR        I2C_2
-#define I2C_SENSOR_FRQ_HZ 20000
+#define I2C_SENSOR_FRQ_HZ 400000
 
 #define I2C1_SCL            GPIO_Pin_10       //PB10 ch1
 #define I2C1_SCL_AF_GPIO    GPIO_PinSource10  //PB8 ch1

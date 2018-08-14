@@ -106,7 +106,7 @@ I2C_STATUS i2cConfig( I2C_DEF i2cIn ,I2C_configDef *config){
 	//i2cInitGpio(0);
 	i2cRecover(I2CProcessing[i2cIn].frq);
 
-	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C1, DISABLE);
+	RCC_APB1PeriphResetCmd(RCC_APB1Periph_I2C2, DISABLE);
 
 	startInitI2C(I2CProcessing[i2cIn].I2C_SEL);
 	i2cInitGpio(1);
@@ -119,7 +119,7 @@ I2C_STATUS i2cConfig( I2C_DEF i2cIn ,I2C_configDef *config){
 	I2C_InitStruct.I2C_OwnAddress1 = 0x00;			  // own address, not relevant in master mode
 	I2C_InitStruct.I2C_Ack = I2C_Ack_Enable;		  // disable acknowledge when reading (can be changed later on)
 	I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit; // set address length to 7 bit addresses
-	I2C_Init(I2CProcessing[i2cIn].I2C_SEL, &I2C_InitStruct);			   // init I2C1
+	I2C_Init(I2CProcessing[i2cIn].I2C_SEL, &I2C_InitStruct);			   // init I2C
 
 	I2CProcessing[i2cIn].transactionStatus = I2C_STATUS_OK;
 	return I2C_STATUS_OK;

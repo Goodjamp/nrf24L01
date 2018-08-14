@@ -26,7 +26,7 @@
 
 
 
-
+#define MES_PERIOD_MS          500
 #define MAX_SENSOR_INIT_ITEM   4
 
 static uint8_t defAddress[5] = "METEO";
@@ -36,8 +36,8 @@ typedef struct
 {
 	uint8_t status;
     int16_t temperature;
-    int16_t humifity;
-    int16_t atmPressure;
+    uint16_t humifity;
+    uint16_t atmPressure;
 }transactionT;
 #pragma pack(pop)
 
@@ -52,6 +52,7 @@ BME280_STATUS bmeStatus;
 float rezMesHumidity;
 float rezMesTemperature;
 float rezMesPressure;
+uint32_t msCnt;
 
 STATUS statusRx;
 STATUS statusTx;
@@ -191,56 +192,62 @@ BME280Handler sensorHandler;
 
 BME280_STATUS initI2C_Sensor(void){
 	BME280_STATUS bmeStatus;
-	bool sensorIsOnLine = false;
 
-	i2c_init();
+	for(uint8_t cnt = 0; cnt < MAX_SENSOR_INIT_ITEM; cnt++)
+	{
+		bool sensorIsOnLine = false;
 
-	BME280_setI2CAddress(&sensorHandler, BME280_ADDRESS_HIGHT);
-    // Is sensor online ?
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_isOnLine(&sensorHandler, &sensorIsOnLine) ) ){
-        return bmeStatus;
-	}
+		i2c_init();
 
-	if( !sensorIsOnLine ){
-		return BME280_STATUS_SENSOR_ERROR;
-	}
+		BME280_setI2CAddress(&sensorHandler, BME280_ADDRESS_LOW);
+		// Is sensor online ?
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_isOnLine(&sensorHandler, &sensorIsOnLine) ) ){
+			continue;
+		}
 
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_init(&sensorHandler) ) )
-	{
-		return bmeStatus;
+		if( !sensorIsOnLine ){
+			continue;
+		}
+
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_init(&sensorHandler) ) )
+		{
+			continue;
+		}
+		// Enable measurement all value with 16 oversemple
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_TEMPERATURE, MES_STATE_ENABLE) ) )
+		{
+			continue;
+		}
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
+		{
+			continue;
+		}
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_PRESSURE, MES_STATE_ENABLE) ) )
+		{
+			continue;
+		}
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
+		{
+			continue;
+		}
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_HUMIDITY, MES_STATE_ENABLE) ) )
+		{
+			continue;
+		}
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
+		{
+			continue;
+		}
+		// set delay between measurement equal 65 ms
+		if(BME280_STATUS_OK  != (bmeStatus = BME280_setMesDelay(&sensorHandler, MEASUREMENT_DELAY_65_5ms) ) )
+		{
+			continue;
+		}
+		return BME280_STATUS_OK;
 	}
-	// Enable measurement all value with 16 oversemple
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_TEMPERATURE, MES_STATE_ENABLE) ) )
-	{
-		return bmeStatus;
-	}
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
-	{
-		return bmeStatus;
-	}
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_PRESSURE, MES_STATE_ENABLE) ) )
-	{
-		return bmeStatus;
-	}
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
-	{
-		return bmeStatus;
-	}
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setValueMesState(&sensorHandler, MES_VALUE_HUMIDITY, MES_STATE_ENABLE) ) )
-	{
-		return bmeStatus;
-	}
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setOverSample(&sensorHandler, MES_VALUE_HUMIDITY, OVERSEMPLE_16) ) )
-	{
-		return bmeStatus;
-	}
-    // set delay between measurement equal 65 ms
-	if(BME280_STATUS_OK  != (bmeStatus = BME280_setMesDelay(&sensorHandler, MEASUREMENT_DELAY_65_5ms) ) )
-	{
-		return bmeStatus;
-	}
-	return BME280_STATUS_OK;
+	return bmeStatus;
 }
+
 
 void delay_(uint32_t delay){
 	uint32_t counter=0;
@@ -255,15 +262,7 @@ void task_nrf24l01(void){
 	delay_(5000000);
 
 	// initilisation sensor
-	for(uint8_t cnt = 0; cnt < MAX_SENSOR_INIT_ITEM; cnt++)
-	{
-	    if( (bmeStatus = initI2C_Sensor()) ==  BME280_STATUS_OK)
-	    {
-	        break;
-	    }
-	}
-
-
+    bmeStatus = initI2C_Sensor();
 	nrfTx = NRF24L01_init(NRF_INTERFACE_N01);
 	nrfRx = NRF24L01_init(NRF_INTERFACE_N02);
 
@@ -282,8 +281,7 @@ void task_nrf24l01(void){
 	//wait set Rx mode
 	delay_(100);
 
-
-	 /*----------------START TRANSMITER---------------------*/
+	/*----------------START TRANSMITER---------------------*/
 	NRF24L01_power_switch(nrfTx, NRF_SET);
 	NRF24L01_FLUSH_TX(nrfTx);
 	NRF24L01_FLUSH_RX(nrfTx);
@@ -302,27 +300,23 @@ void task_nrf24l01(void){
 	//------------ wait receive  data-------------------
 	//while(statusRx.RX_DR == 0){
 	while( 1 ){
+		while(msCnt > xTaskGetTickCount()){}
+		msCnt = xTaskGetTickCount() + MES_PERIOD_MS;
 		NRF24L01_get_status_tx_rx(nrfRx, &statusRx);
 		NRF24L01_get_status_tx_rx(nrfTx, &statusTx);
 		if(statusTx.MAX_RT == 1)
 		{
 			NRF24L01_FLUSH_TX(nrfTx);
 			NRF24L01_clear_interrupt(nrfTx, STATUS_MAX_RT );
-			NRF24L01_send_data(nrfTx, sizeof(transactionT), txBuff.buf);
-			continue;
+			//NRF24L01_send_data(nrfTx, sizeof(transactionT), txBuff.buf);
+			//continue;
 		}
-		if(statusTx.TX_DS == 1)
-		{
+		//if(statusTx.TX_DS == 1)
+		//{
 			NRF24L01_clear_interrupt(nrfTx, STATUS_MAX_RT );
             if( bmeStatus !=  BME280_STATUS_OK)
             {
-				for(uint8_t cnt = 0; cnt < MAX_SENSOR_INIT_ITEM; cnt++)
-				{
-					if( (bmeStatus = initI2C_Sensor()) ==  BME280_STATUS_OK)
-			        {
-			            break;
-			        }
-                }
+				bmeStatus = initI2C_Sensor();
 			}
 
             if( bmeStatus ==  BME280_STATUS_OK)
@@ -333,7 +327,7 @@ void task_nrf24l01(void){
                 {
 				    txData.temperature = rezMesTemperature *10;
 				    txData.humifity    = rezMesHumidity    *10;
-				    txData.atmPressure = rezMesPressure;
+				    txData.atmPressure = rezMesPressure * 0.00750062;
 				    txData.status      = 0;
 			   }
                 else
@@ -346,9 +340,8 @@ void task_nrf24l01(void){
             	txData.status = 1;
             }
 			NRF24L01_read_rx_data(nrfRx, sizeof(transactionT), rxBuff.buf);
-			delay_(72 * 70000);
 			NRF24L01_send_data(nrfTx, sizeof(transactionT), txBuff.buf);
-		}
+		//}
 	}; //wait interrupt
 	NRF24L01_clear_interrupt(nrfRx,STATUS_RX_DR);
 	NRF24L01_get_status_tx_rx(nrfRx, &statusRx);
