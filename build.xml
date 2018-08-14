@@ -77,6 +77,8 @@
       <includepath path="stm_lib"/>
       <includepath path="stm_lib/inc"/>
       <includepath path="D:\Private\Programing\MCU\STM32\CooCox\INFORM_P\NRF24L01_103\nrf24L01_103\NRF_src"/>
+      <includepath path="BME280_HAL"/>
+      <includepath path="I2C_HAL"/>
       
       <!-- arm-none-eabi-gcc compiler arguments -->
       <compilerarg value="-mcpu=cortex-m3"/>
@@ -84,6 +86,7 @@
       <compilerarg value="-Wall"/>      
       <compilerarg value="-ffunction-sections"/>
       <compilerarg value="-O0"/>
+      <compilerarg value="-std=c1x"/>
       <compilerarg value="-g"/>
       
       <!-- arm-none-eabi-gcc linker arguments -->

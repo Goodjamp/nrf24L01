@@ -13,6 +13,7 @@
     <Component id="bff208d1-96ed-11df-80ae-001d7d723e56" name="EXTI"/>
     <Component id="c0446e91-96ed-11df-80ae-001d7d723e56" name="SPI"/>
     <Component id="c04d9651-96ed-11df-80ae-001d7d723e56" name="I2C"/>
+    <Component id="c064a0c1-96ed-11df-80ae-001d7d723e56" name="TIM"/>
   </Components>
   <ExcludedFiles>
     <Exclude path="stm32f10x_it.c"/>

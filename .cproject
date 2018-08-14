@@ -17,9 +17,11 @@
 						<entry flags="" kind="includePath" name="C:\Program Files (x86)\GNU Tools ARM Embedded\4.7 2013q1\lib\gcc\arm-none-eabi\4.7.3\include"/>
 						<entry flags="" kind="includePath" name="C:\Program Files (x86)\GNU Tools ARM Embedded\4.7 2013q1\lib\gcc\arm-none-eabi\4.7.3\include-fixed"/>
 						<entry flags="" kind="includePath" name="."/>
+						<entry flags="" kind="includePath" name="BME280_HAL"/>
 						<entry flags="" kind="includePath" name="cmsis"/>
 						<entry flags="" kind="includePath" name="cmsis_boot"/>
 						<entry flags="" kind="includePath" name="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/NRF_src"/>
+						<entry flags="" kind="includePath" name="I2C_HAL"/>
 						<entry flags="" kind="includePath" name="stm_lib"/>
 						<entry flags="" kind="includePath" name="stm_lib/inc"/>
 						<entry flags="" kind="macro" name="__GNUC__" value=""/>
@@ -38,17 +40,21 @@
 		<pathentry include="C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q1/lib/gcc/arm-none-eabi/4.7.3/include" kind="inc" path="" system="true"/>
 		<pathentry include="C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q1/lib/gcc/arm-none-eabi/4.7.3/include-fixed" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103" kind="inc" path="" system="true"/>
+		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/BME280_HAL" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/cmsis" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/cmsis_boot" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/NRF_src" kind="inc" path="" system="true"/>
+		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/I2C_HAL" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/stm_lib" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/stm_lib/inc" kind="inc" path="" system="true"/>
 		<pathentry include="C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q1/arm-none-eabi/include" kind="inc" path="" system="true"/>
 		<pathentry include="C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q1/lib/gcc/arm-none-eabi/4.7.3/include" kind="inc" path="" system="true"/>
 		<pathentry include="C:/Program Files (x86)/GNU Tools ARM Embedded/4.7 2013q1/lib/gcc/arm-none-eabi/4.7.3/include-fixed" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103" kind="inc" path="" system="true"/>
+		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/BME280_HAL" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/cmsis" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/cmsis_boot" kind="inc" path="" system="true"/>
+		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/I2C_HAL" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/stm_lib" kind="inc" path="" system="true"/>
 		<pathentry include="D:/Private/Programing/MCU/STM32/CooCox/INFORM_P/NRF24L01_103/nrf24L01_103/stm_lib/inc" kind="inc" path="" system="true"/>
 		<pathentry kind="mac" name="__GNUC__" path="" value=""/>
