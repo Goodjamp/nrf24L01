@@ -25,11 +25,17 @@
 
 
 
-
+#define NRF_CHANEL             10
 #define MES_PERIOD_MS          500
 #define MAX_SENSOR_INIT_ITEM   4
-
 static uint8_t defAddress[5] = "METEO";
+
+// bit position of remote meteo post status remote
+typedef enum{
+	REM_METEO_STATUS_ERROR_SENSOR = 0,
+	REM_METEO_STATUS_ERROR_MES    = 1,
+	REM_METEO_STATUS_ERROR_BATARY = 2
+}REM_METEO_STATUS;
 
 #pragma pack(push, 1)
 typedef struct
@@ -38,6 +44,7 @@ typedef struct
     int16_t temperature;
     uint16_t humifity;
     uint16_t atmPressure;
+    uint16_t atmPressurehPa;
 }transactionT;
 #pragma pack(pop)
 
@@ -272,7 +279,7 @@ void task_nrf24l01(void){
 	NRF24L01_FLUSH_TX(nrfRx);
 	NRF24L01_set_RX_address(nrfRx, PIPE0, defAddress);
 	NRF24L01_set_crco(nrfRx, CRCO_2_BYTES);
-	//NRF24L01_set_TX_addres (NRF2, defAddress);
+	//NRF24L01_set_TX_addres (nrfRx, defAddress);
 	// set payload width
 	NRF24L01_set_TX_PayloadSize(nrfRx, PIPE0, sizeof(transactionT));
 	NRF24L01_clear_interrupt(nrfRx, STATUS_RX_DR); // Clear status NRF
@@ -288,18 +295,19 @@ void task_nrf24l01(void){
 	NRF24L01_set_RX_address(nrfTx, PIPE0, defAddress);
 	NRF24L01_set_TX_addres (nrfTx, defAddress);
 	NRF24L01_set_crco(nrfTx, CRCO_2_BYTES);
-	// set payload width
 	NRF24L01_set_TX_PayloadSize(nrfTx, PIPE0, sizeof(transactionT));
-	// clear all interrupt flags;
+	NRF24L01_set_rf_dr(nrfTx, DATA_SPEED_250K);
+	NRF24L01_set_rf_chanel(nrfTx, NRF_CHANEL);
 	NRF24L01_clear_interrupt(nrfTx, STATUS_RX_DR | STATUS_TX_DS | STATUS_MAX_RT );
     // setup number of retransmit
-	NRF24L01_set_num_retr(nrfTx, 2);
+	NRF24L01_set_num_retr(nrfTx, 10);
 	NRF24L01_set_delay_retr(nrfTx, WAIT_500uS);
 	NRF24L01_set_tx_mode(nrfTx);
 
 	//------------ wait receive  data-------------------
 	//while(statusRx.RX_DR == 0){
-	while( 1 ){
+	while( 1 )
+	{
 		while(msCnt > xTaskGetTickCount()){}
 		msCnt = xTaskGetTickCount() + MES_PERIOD_MS;
 		NRF24L01_get_status_tx_rx(nrfRx, &statusRx);
@@ -313,36 +321,33 @@ void task_nrf24l01(void){
 		}
 		//if(statusTx.TX_DS == 1)
 		//{
-			NRF24L01_clear_interrupt(nrfTx, STATUS_MAX_RT );
-            if( bmeStatus !=  BME280_STATUS_OK)
-            {
-				bmeStatus = initI2C_Sensor();
-			}
+		NRF24L01_clear_interrupt(nrfTx, STATUS_MAX_RT );
+		if( bmeStatus !=  BME280_STATUS_OK)
+		{
+			bmeStatus = initI2C_Sensor();
+		}
 
-            if( bmeStatus ==  BME280_STATUS_OK)
-            {
-                if(BME280_STATUS_OK  == (bmeStatus = BME280_forcedMes(&sensorHandler, &rezMesTemperature,
-							                                                          &rezMesPressure,
-								                                                      &rezMesHumidity) ) )
-                {
-				    txData.temperature = rezMesTemperature *10;
-				    txData.humifity    = rezMesHumidity    *10;
-				    txData.atmPressure = rezMesPressure * 0.00750062;
-				    txData.status      = 0;
-			   }
-                else
-                {
-                	txData.status = 1;
-                }
+		if( bmeStatus ==  BME280_STATUS_OK)
+		{
+			if(BME280_STATUS_OK  == (bmeStatus = BME280_forcedMes(&sensorHandler, &rezMesTemperature,
+					&rezMesPressure,
+					&rezMesHumidity) ) )
+			{
+				txData.temperature    = rezMesTemperature *10;
+				txData.humifity       = rezMesHumidity    *10;
+				txData.atmPressure    = rezMesPressure * 0.00750062;
+				txData.atmPressurehPa = rezMesPressure;
+				txData.status         = 0;
 			}
-            else
-            {
-            	txData.status = 1;
-            }
-			NRF24L01_read_rx_data(nrfRx, sizeof(transactionT), rxBuff.buf);
-			NRF24L01_send_data(nrfTx, sizeof(transactionT), txBuff.buf);
+		}
+		else
+		{
+			txData.status = (uint8_t)(1 << REM_METEO_STATUS_ERROR_SENSOR);
+		}
+		NRF24L01_read_rx_data(nrfRx, sizeof(transactionT), rxBuff.buf);
+		NRF24L01_send_data(nrfTx, sizeof(transactionT), txBuff.buf);
 		//}
-	}; //wait interrupt
+    }; //wait interrupt
 	NRF24L01_clear_interrupt(nrfRx,STATUS_RX_DR);
 	NRF24L01_get_status_tx_rx(nrfRx, &statusRx);
 	NRF24L01_read_rx_data(nrfRx, sizeof(transactionT), rxBuff.buf);

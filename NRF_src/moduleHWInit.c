@@ -267,7 +267,7 @@ static inline void spi_nrf_find_irq(u16 pin_input){
 	{
 		if(gpioComState[cnt].IRQ_pin == pin_input)
 		{
-			NRF24L01_set_interupt(perephirialInitList.selNrf[cnt]);
+			NRF24L01_IRQ_event(perephirialInitList.selNrf[cnt]);
 			return;
 		}
 	}

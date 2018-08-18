@@ -86,17 +86,17 @@ NRF_ERROR NRF24L01_init_nrf(nrfHeader inNRF, const S_NRF_Init* ps_nrf_init)
 // arg out:
 //        0 - operation complete successfully
 //       >0 - ref. NRF_ERROR reason
-NRF_ERROR S_NRF_default(S_NRF_Init* ps_nrf_init)
+NRF_ERROR S_NRF_default_init(S_NRF_Init* ps_nrf_init)
 {
-	ps_nrf_init->crc_state=CRC_STATE_DEFAULT;
-	ps_nrf_init->crc_width=CRC_SIZE_DEFAULT;
-	ps_nrf_init->address_width=ADDRESS_SIZE_DEFAULT;
-	ps_nrf_init->auto_retransmit_delay=AUTO_RETR_DELAY_DEFAULT;
-	ps_nrf_init->auto_retransmit_count=AUTO_RETR_COUNT_DEFAULT;
-	ps_nrf_init->rf_chanel=RF_CHANEL_DEFAULT;
-	ps_nrf_init->speed=SPEED_DEFAULT;
-	ps_nrf_init->out_amplifare=OUT_AMPLIFARE_DEFAULT;
-	ps_nrf_init->dynamic_payload_state=DYNAMIC_PAYLOAD_STATE_DEFAULT;
+	ps_nrf_init->crc_state             = CRC_STATE_DEFAULT;
+	ps_nrf_init->crc_width             = CRC_SIZE_DEFAULT;
+	ps_nrf_init->address_width         = ADDRESS_SIZE_DEFAULT;
+	ps_nrf_init->auto_retransmit_delay = AUTO_RETR_DELAY_DEFAULT;
+	ps_nrf_init->auto_retransmit_count = AUTO_RETR_COUNT_DEFAULT;
+	ps_nrf_init->rf_chanel             = RF_CHANEL_DEFAULT;
+	ps_nrf_init->dr                    = SPEED_DEFAULT;
+	ps_nrf_init->out_amplifare         = OUT_AMPLIFARE_DEFAULT;
+	ps_nrf_init->dynamic_payload_state = DYNAMIC_PAYLOAD_STATE_DEFAULT;
 	TX_ADDRESS_DEFAULT(ps_nrf_init->transmit_address);
 	return NRF_OK;
 }
@@ -336,6 +336,19 @@ NRF_ERROR NRF24L01_set_delay_retr(nrfHeader inNRF, RETRANSMIT_DELAY  auto_retr_d
 	restricAvoidType(SETUP_RETR, readReg, &inNRF->global_reg_map.setup_petr);
 	return NRF24L01_write_reg(inNRF, SETUP_RETR_ADDRESS, 1, readReg.simplType);
 }
+
+NRF_ERROR NRF24L01_set_rf_dr(nrfHeader inNRF, RF_DR  inDR)
+{
+	if(!IS_RF_DR(inDR))
+	{
+		return NRF_ERROR_ARG;
+	}
+	inNRF->global_reg_map.rf_setup.RF_DR_LOW   = (uint8_t)0b01 & inDR;
+	inNRF->global_reg_map.rf_setup.RF_DR_HIGHT = (uint8_t)0b10 & inDR;
+	restricAvoidType(RF_SETUP, readReg, &inNRF->global_reg_map.rf_setup);
+	return NRF24L01_write_reg(inNRF, RF_SETUP_ADDRESS, 1, readReg.simplType);
+}
+
 
 //---------NRF24L01_set_rf_chanel-----------------
 // function NRF24L01_set_rf_chanel - set number rf channel
@@ -634,7 +647,7 @@ NRF_ERROR NRF24L01_set_tx_mode(nrfHeader inNRF){
 
 
 
-void NRF24L01_set_interupt(nrfHeader inNRF)
+void NRF24L01_IRQ_event(nrfHeader inNRF)
 {
 	inNRF->isInterrupt = true;
 }

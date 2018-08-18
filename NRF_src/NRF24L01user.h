@@ -128,10 +128,10 @@ typedef enum{
 	DATA_SPEED_1M   = (uint8_t)0b00,
 	DATA_SPEED_2M   = (uint8_t)0b01,
 	DATA_SPEED_250K = (uint8_t)0b10
-}RF_DR_HIGHT;
+}RF_DR;
 
-#define IS_RF_DR_HIGHT(X) ((X == DATA_SPEED_1M) || (X == DATA_SPEED_2M)||\
-		                   (X == DATA_SPEED_250K))
+#define IS_RF_DR(X) ((X == DATA_SPEED_1M) || (X == DATA_SPEED_2M)||\
+		             (X == DATA_SPEED_250K))
 
 typedef enum{
 	DATA_PWR_m18dBm =(uint8_t)0b00,
@@ -146,18 +146,19 @@ typedef enum{
 /************************ERROR STATUS NRF24L01************************/
 typedef enum{
 	NRF_OK                      = (uint8_t)0,
-	NRF_BUSY                    = (uint8_t)1,
-	NRF_ERROR_PIPE_NUMBER       = (uint8_t)2,
-	NRF_ERROR_ADDRESS_REG       = (uint8_t)3,
-	NRF_ERROR_AMOUNT_NRF        = (uint8_t)4,
-	NRF_ERROR_QUANTITY_RETRANSMIT =(uint8_t)5,
-	NRF_ERROR_ADDRESS_WIDTH     = (uint8_t)6,
-	NRF_ERROR_MAX_DATA_SIZE     = (uint8_t)7,
-	NRF_ERROR_PWR_UP_STATE      = (uint8_t)8,
-	NRF_ERROR_INTERUPT_MASK     = (uint8_t)9,
-	NRF_ERROR_PAYLOAD_SIZE      = (uint8_t)10,
-	NRF_ERROR_RETRANSMIT_DELAY  = (uint8_t)11,
-	NRF_ERROR_EXCEED_RF_CHANNEL = (uint8_t)12
+	NRF_ERROR_ARG               = (uint8_t)1,
+	NRF_BUSY                    = (uint8_t)2,
+	NRF_ERROR_PIPE_NUMBER       = (uint8_t)3,
+	NRF_ERROR_ADDRESS_REG       = (uint8_t)4,
+	NRF_ERROR_AMOUNT_NRF        = (uint8_t)5,
+	NRF_ERROR_QUANTITY_RETRANSMIT =(uint8_t)6,
+	NRF_ERROR_ADDRESS_WIDTH     = (uint8_t)7,
+	NRF_ERROR_MAX_DATA_SIZE     = (uint8_t)8,
+	NRF_ERROR_PWR_UP_STATE      = (uint8_t)9,
+	NRF_ERROR_INTERUPT_MASK     = (uint8_t)10,
+	NRF_ERROR_PAYLOAD_SIZE      = (uint8_t)11,
+	NRF_ERROR_RETRANSMIT_DELAY  = (uint8_t)12,
+	NRF_ERROR_EXCEED_RF_CHANNEL = (uint8_t)13
 }NRF_ERROR;
 
 typedef enum{
@@ -320,6 +321,7 @@ NRF_ERROR NRF24L01_enable_AA         (nrfHeader inNRF, PIPS_DEF PipeNumber);
 NRF_ERROR NRF24L01_enable_pipe       (nrfHeader inNRF, PIPS_DEF PipeNumber);
 NRF_ERROR NRF24L01_set_num_retr      (nrfHeader inNRF, uint8_t num_retransmit);
 NRF_ERROR NRF24L01_set_delay_retr    (nrfHeader inNRF, RETRANSMIT_DELAY auto_retr_delay);
+NRF_ERROR NRF24L01_set_rf_dr         (nrfHeader inNRF, RF_DR  inDR);
 NRF_ERROR NRF24L01_set_address_width (nrfHeader inNRF, AW  address_width);
 NRF_ERROR NRF24L01_set_RX_address    (nrfHeader inNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress);
 NRF_ERROR NRF24L01_get_RX_address    (nrfHeader inNRF, PIPS_DEF PipeNumber, uint8_t *pPipeAddress);
@@ -333,7 +335,7 @@ NRF_ERROR NRF24L01_send_data         (nrfHeader inNRF, uint8_t data_length, uint
 NRF_ERROR NRF24L01_read_rx_data      (nrfHeader inNRF , uint8_t num, uint8_t *pdata_read);
 
 /*************************USER SHOULD CALL IN CASE OF IRQ EVENT**********************/
-void      NRF24L01_set_interupt      (nrfHeader inNRF);
+void      NRF24L01_IRQ_event      (nrfHeader inNRF);
 
 /*************************USER IMPLEMENTATION FUNCTION*******************************/
 typedef enum{

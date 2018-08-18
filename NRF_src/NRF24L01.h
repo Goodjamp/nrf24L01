@@ -86,7 +86,7 @@ typedef struct{
 	uint8_t     auto_retransmit_delay;
 	uint8_t     auto_retransmit_count;  // 0 - retransmit disabled
 	uint8_t     rf_chanel;              // radio frequency channel number 0-127 1 mHz resolution
-	RF_DR_HIGHT speed;
+	RF_DR       dr;
 	RF_PWR      out_amplifare;
 	uint8_t     transmit_address[5];
 	NRF_STATE   dynamic_payload_state;
@@ -118,7 +118,7 @@ typedef struct nrfHeaderT
 #define  AUTO_RETR_DELAY_DEFAULT        15
 #define  AUTO_RETR_COUNT_DEFAULT        15
 #define  RF_CHANEL_DEFAULT              0b10
-#define  SPEED_DEFAULT                  DATA_SPEED_2M
+#define  SPEED_DEFAULT                  DATA_SPEED_250K
 #define  OUT_AMPLIFARE_DEFAULT          DATA_PWR_0dBm
 #define  TX_ADDRESS_DEFAULT(X)          X[0]=0xE7;X[1]=0xE7;X[2]=0xE7;X[3]=0xE7;X[4]=0xE7;
 #define  DYNAMIC_PAYLOAD_STATE_DEFAULT  NRF_RESET
